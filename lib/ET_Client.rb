@@ -48,6 +48,7 @@ class ET_CreateWSDL
   
   def initialize(path)
     # Get the header info for the correct wsdl
+  @wsdl_filename = "/#{Digest::MD5.hexdigest(@wsdl)}.xml"
 	response = HTTPI.head(@wsdl)
 	if response and (response.code >= 200 and response.code <= 400) then
 		header = response.headers
@@ -58,7 +59,7 @@ class ET_CreateWSDL
 		unless File.directory?(path)
 			FileUtils.mkdir_p(path)
 		end
-		p = path + '/ExactTargetWSDL.xml'
+		p = path + @wsdl_filename
 		# Check if a local file already exists
 		if (File.file?(p) and File.readable?(p) and !File.zero?(p)) then
 			createdTime = File.new(p).mtime.to_date
@@ -136,7 +137,7 @@ class ET_Client < ET_CreateWSDL
 				@authObj = {'oAuth' => {'oAuthToken' => @internalAuthToken}}			
 				@authObj[:attributes!] = { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}						
 				
-				myWSDL = File.read(@path + '/ExactTargetWSDL.xml')
+				myWSDL = File.read(@path + @wsdl_filename)
 				@auth = Savon.client(:soap_header => @authObj, :wsdl => myWSDL, :endpoint => @endpoint, :wsse_auth => ["*", "*"], :raise_errors => false, :log => @debug, :open_timeout => 180, :read_timeout => 180)
 			else 				
 				self.refreshToken	
@@ -161,7 +162,7 @@ class ET_Client < ET_CreateWSDL
 
 	def authenticateWSSE
     	begin
-		    myWSDL = File.read(@path + '/ExactTargetWSDL.xml')
+		    myWSDL = File.read(@path + @wsdl_filename)
 	        @auth = Savon.client(:wsdl => myWSDL,
 								 :endpoint => @endpoint,
 								 :wsse_auth => [@username, @password],
@@ -212,7 +213,7 @@ class ET_Client < ET_CreateWSDL
 			@authObj = {'oAuth' => {'oAuthToken' => @internalAuthToken}}			
 			@authObj[:attributes!] = { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}						
 			
-			myWSDL = File.read(@path + '/ExactTargetWSDL.xml')
+			myWSDL = File.read(@path + @wsdl_filename)
 			@auth = Savon.client(:soap_header => @authObj,
 				:wsdl => myWSDL,
 				:endpoint => @endpoint,

@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.authors = ["Michael Allen Clark", "Gary Lo"]
   s.files = ["README.md", "lib/ET_Client.rb"]
   s.add_dependency("savon", "~> 2.0")
-  s.add_dependency('json', '~> 1.7.0')
+  s.add_dependency('json', '~> 1.8.0')
   s.add_dependency('jwt', '= 0.1.6')
 end
